@@ -1,0 +1,6 @@
+.b-1-category {
+    display: flex;
+    border: 1px solid #d9d9e5;
+    padding: 6px;
+    text-align: center;
+}

@@ -7,6 +7,7 @@
 
     @stack('styles')
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+    <link rel="stylesheet" href="{{ asset('admin_resources/css/typicons.css') }}">
 
     <!-- endinject -->
     <link rel="shortcut icon" href="/favicon_io/favicon.ico" />

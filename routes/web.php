@@ -142,7 +142,7 @@ Route::prefix('admin')->middleware(RedirectIfNotAdmin::class)->group(function ()
         Route::post('menu', [MenuController::class, 'store'])->name('admin.menus.store');
         Route::patch('menu/{id}', [MenuController::class, 'update'])->name('admin.menus.update');
         Route::delete('menu/{id}', [MenuController::class, 'destroy'])->name('admin.menus.destroy');
-    
+        Route::get('/menus-by-category/{id}', [MenuController::class, 'menusByCategory']);
         Route::get('general-settings', [GeneralSettingsController::class, 'index'])->name('admin.general-settings');
 
         

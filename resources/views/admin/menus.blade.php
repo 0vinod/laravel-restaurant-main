@@ -90,72 +90,105 @@
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <span>Menus ({{ $categories->sum(fn($category) => $category->menus->count()) }})</span>
-            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addModal">
-                Add Menu
-            </button>
+            
         </div>
         <div class="card-body">
             <div class="row">
-                @forelse ($categories as $category)
-                    <div class="col-md-12 mb-4">
-                        <h4>CATEGORY: {{ $category->name }}</h4>
-                        <hr style="border:1px solid #000">
-                        <div class="table-responsive pt-3">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th style="width:20%">Name</th>
-                                        <th style="width:50%">Description</th>
-                                        <th>Price</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse ($category->menus as $menu)
-                                        <tr>
-                                            <td>
-                                                <!-- Trigger for Lightbox Modal -->
-                                                <img src="{{ asset('storage/' . $menu->image) }}" alt="Menu Image" width="50" class="img-thumbnail trigger-lightbox" data-bs-toggle="modal" data-bs-target="#imageModal" data-image="{{ asset('storage/' . $menu->image) }}">  {{ $menu->name }}
-                                            </td>
-                                            <td>{{ $menu->description }}</td>
-                                            <td>{!! $site_settings->currency_symbol !!}{{ $menu->price }}</td>
-                                            <td>
-                                                <button class="m-1 btn btn-primary btn-sm edit-btn"
-                                                        data-id="{{ $menu->id }}"
-                                                        data-name="{{ $menu->name }}"
-                                                        data-description="{{ $menu->description }}"
-                                                        data-price="{{ $menu->price }}"
-                                                        data-category_id="{{ $menu->category_id }}"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#editModal">
-                                                        <i class="fa fa-edit" aria-hidden="true"></i>
-                                                </button>
-                                                <button class="m-1 btn btn-danger btn-sm delete-btn"
-                                                        data-id="{{ $menu->id }}"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#deleteModal">
-                                                        <i class="fa fa-trash" aria-hidden="true"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="5" class="text-center">No menus available.</td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
+                <!-- Left Sidebar for Categories -->
+                <div class="col-md-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5>Categories</h5>
+                        <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#createModalcategory">+</button>
+                    </div>
+                    <ul class="list-group">
+                        @foreach ($categories as $category)
+                            <li class="list-group-item category-item {{ $loop->first ? 'active' : '' }}"
+                                data-category-id="{{ $category->id }}"
+                                style="cursor: pointer;">
+                                {{ $category->name }}
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+        
+                <!-- Right Side for Menus -->
+                <div class="col-md-9">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="b-1-category"><small>Category /</small><small id="selected-category-name">{{ $categories->first()->name ?? 'Select a Category' }}</small></div>
+                        <div class="d-flex gap-2">
+                            <input type="text" id="menu-search" class="form-control form-control-sm" placeholder="Search menus..." style="width:200px;">
+                            
+                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addModal">
+                               + Add Menu
+                            </button>
                         </div>
                     </div>
-                @empty
-                    <p>No categories available.</p>
-                @endforelse
+        
+                    <div id="menu-list" class="list-group">
+                        @forelse ($categories->first()->menus as $menu)
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center gap-3">
+                                    <img src="{{ asset('storage/' . $menu->image) }}" alt="Menu Image" width="40" class="rounded">
+                                    <div class="ml-2">
+                                        <div>{{ $menu->name }}</div>
+                                        <small>{{ $menu->description }}</small>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <strong>{!! $site_settings->currency_symbol !!} {{ $menu->price }}</strong>
+                                    <button class="m-1 btn btn-primary btn-sm edit-btn"
+                                    data-id="{{ $menu->id }}"
+                                    data-name="{{ $menu->name }}"
+                                    data-description="{{ $menu->description }}"
+                                    data-price="{{ $menu->price }}"
+                                    data-category_id="{{ $menu->category_id }}"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#editModal">
+                                    <i class="fa fa-edit" aria-hidden="true"></i>
+                            </button>
+                            <button class="m-1 btn btn-danger btn-sm delete-btn"
+                                    data-id="{{ $menu->id }}"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal">
+                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                            </button>
+                                </div>
+                            </div>
+                        @empty
+                            <p>No menus available for this category.</p>
+                        @endforelse
+                    </div>
+                </div>
             </div>
         </div>
+        
     </div>
-    
-  
+   
 
+   <!-- Create Modal -->
+   <div class="modal fade" id="createModalcategory" tabindex="-1" aria-labelledby="createModalcategoryLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form method="POST" action="{{ route('admin.categories.store') }}">
+            @csrf
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createModalcategoryLabel">Add New Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"> <i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="name">Category Name</label>
+                        <input type="text" name="name" class="form-control" id="name" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 
 <!-- Lightbox Modal -->
 <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
@@ -303,4 +336,30 @@
 
 
 
- 
+<script>
+    document.querySelectorAll('.category-item').forEach(item => {
+        item.addEventListener('click', function() {
+            document.querySelectorAll('.category-item').forEach(i => i.classList.remove('active'));
+            this.classList.add('active');
+
+            const categoryId = this.getAttribute('data-category-id');
+
+            // TODO: Replace this part with an AJAX call to load menus for selected category
+            // Example:
+            fetch(`admin/menus-by-category/${categoryId}`)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('menu-list').innerHTML = html;
+                    document.getElementById('selected-category-name').innerText = this.innerText;
+                });
+        });
+    });
+
+    document.getElementById('menu-search').addEventListener('input', function() {
+        const keyword = this.value.toLowerCase();
+        document.querySelectorAll('#menu-list .list-group-item').forEach(item => {
+            const text = item.innerText.toLowerCase();
+            item.style.display = text.includes(keyword) ? '' : 'none';
+        });
+    });
+</script>

@@ -82,6 +82,11 @@ class MenuController extends Controller
 
         return redirect()->route('admin.menus.index')->with('success', 'Menu deleted successfully!');
     }
-
+    
+    public function menusByCategory($id)
+    {
+        $category = Category::with('menus')->find($id);
+        return view('partials.menu-list', compact('category'))->render();
+    }
 
 }
