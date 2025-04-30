@@ -86,7 +86,10 @@ class MenuController extends Controller
     public function menusByCategory($id)
     {
         $category = Category::with('menus')->find($id);
-        return view('partials.menu-list', compact('category'))->render();
+        $categoryName = $category->name;
+        $menus = $category?->menus ?? collect();
+          
+        return view('partials.menu_item', compact('categoryName','menus'))->render();
     }
 
 }

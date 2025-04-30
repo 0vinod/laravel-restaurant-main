@@ -46,7 +46,8 @@
         $('#deleteCategoryName').text(blogName);
     });
 
-    $('.edit-btn').on('click', function () {
+    $(document).on('click','.edit-btn', function () {
+
         var id = $(this).data('id');
         var name = $(this).data('name');
         var content = $(this).data('content');

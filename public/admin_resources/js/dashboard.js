@@ -761,8 +761,4 @@ if ($("#ecommerceAnalyticDark").length) {
       options: eCommerceAnalyticDarkOptions
   });
 }
-
-
-
-  });
 })(jQuery);
