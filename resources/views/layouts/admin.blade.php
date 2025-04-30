@@ -9,7 +9,7 @@
     @stack('styles')
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
     <link rel="stylesheet" href="{{ asset('admin_resources/css/typicons.css') }}">
-    <link href="{{ asset('/asset/css/select2.min.css') }}" rel="stylesheet" />
+
     <!-- endinject -->
     <link rel="shortcut icon" href="/favicon_io/favicon.ico" />
 </head>
@@ -54,7 +54,7 @@
             @yield('content')
 
             @include('partials.logout')
-            <script src="{{ asset('asset/js/select2.min.js') }}"></script>
+          
         </div>
         <!-- page-body-wrapper ends -->
     </div>

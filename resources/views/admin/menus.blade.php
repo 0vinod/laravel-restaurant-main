@@ -5,91 +5,16 @@
     <link rel="stylesheet" href="/admin_resources/vendors/typicons.font/font/typicons.css">
     <link rel="stylesheet" href="/admin_resources/vendors/css/vendor.bundle.base.css">
     <link rel="stylesheet" href="/admin_resources/css/vertical-layout-light/style.css">
+
+    <!-- Add Font Awesome if you're using its icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 @endpush
 
-@push('scripts')
-    <script src="/admin_resources/vendors/js/vendor.bundle.base.js"></script>
-    <script src="/admin_resources/js/off-canvas.js"></script>
-    <script src="/admin_resources/js/hoverable-collapse.js"></script>
-    <script src="/admin_resources/js/template.js"></script>
-    <script src="/admin_resources/js/settings.js"></script>
-    <script src="/admin_resources/js/todolist.js"></script>
-    <!-- plugin js for this page -->
-    <script src="/admin_resources/vendors/progressbar.js/progressbar.min.js"></script>
-    <script src="/admin_resources/vendors/chart.js/Chart.min.js"></script>
-    <!-- Custom js for this page-->
-    <script src="/admin_resources/js/dashboard.js"></script>
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-
-
-    <script>
-        $(document).ready(function() {
-            // Edit Modal
-            $(document).on('click', '.edit-btn', function() {
-                let id = $(this).data('id');
-                let name = $(this).data('name');
-                let description = $(this).data('description');
-                let price = $(this).data('price');
-                let category_id = $(this).data('category_id');
-
-                let actionUrl = "{{ route('admin.menus.update', ':id') }}".replace(':id', id);
-
-                $('#editName').val(name);
-                $('#editDescription').val(description);
-                $('#editPrice').val(price);
-                $('#editCategory').val(category_id);
-                $('#editForm').attr('action', actionUrl);
-            });
-
-            // Delete Modal
-            $(document).on('click', '.delete-btn', function() {
-                let id = $(this).data('id');
-                let actionUrl = "{{ route('admin.menus.destroy', ':id') }}".replace(':id', id);
-
-                $('#deleteForm').attr('action', actionUrl);
-            });
-
-            $(document).on('input', '#menu-search', function() {
-
-                const keyword = $(this).val().toLowerCase();
-
-                console.log('keyword', keyword)
-                $('#menu-list .list-group-item').each(function() {
-                    const text = $(this).text().toLowerCase();
-
-                    console.log('text', text, text.includes(keyword))
-                    if (text.includes(keyword)) {
-                        $(this).show();
-                    } else {
-                        $(this).hide();
-                    }
-                });
-            });
-        });
-    </script>
-
-
-    <script>
-        $(document).ready(function() {
-            $('.trigger-lightbox').click(function() {
-                var imageUrl = $(this).data('image');
-
-                $('#modalImage').attr('src', imageUrl);
-            });
-        });
-    </script>
-@endpush
-
-@section('title', 'Admin - Menu')
+@section('title', 'Admin - Menu Management')
 
 @section('content')
-
     <div class="main-panel">
         <div class="content-wrapper">
-
             @include('partials.message-bag')
 
             <div class="card">
@@ -102,13 +27,16 @@
                         <div class="col-md-3">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <h5>Categories</h5>
-                                <button class="btn btn-sm btn-success" data-bs-toggle="modal"
-                                    data-bs-target="#createModalcategory">+</button>
+                                <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#createModalcategory">
+                                    <i class="fa fa-plus"></i>
+                                </button>
                             </div>
                             <ul class="list-group">
                                 @foreach ($categories as $category)
                                     <li class="list-group-item category-item {{ $loop->first ? 'active' : '' }}"
-                                        data-category-id="{{ $category->id }}" style="cursor: pointer;">
+                                        data-category-id="{{ $category->id }}" 
+                                        data-category-name="{{ $category->name }}"
+                                        style="cursor: pointer;">
                                         {{ $category->name }}
                                     </li>
                                 @endforeach
@@ -118,63 +46,66 @@
                         <!-- Right Side for Menus -->
                         <div class="col-md-9" id="menuItemGet">
                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                <div class="b-1-category"><small>Category /</small><small
-                                        id="selected-category-name">{{ $categories->first()->name ?? 'Select a Category' }}</small>
+                                <div class="b-1-category">
+                                    <small>Category /</small>
+                                    <small id="selected-category-name">{{ $categories->first()->name ?? 'Select a Category' }}</small>
                                 </div>
                                 <div class="d-flex gap-2">
                                     <input type="text" id="menu-search" class="form-control form-control-sm"
                                         placeholder="Search menus..." style="width:200px;">
-
-                                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                                        data-bs-target="#addModal">
-                                        + Add Menu
+                                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addModal">
+                                        <i class="fa fa-plus"></i> Add Menu
                                     </button>
                                 </div>
                             </div>
 
                             <div id="menu-list" class="list-group">
-                                <?php
-                                $menus = $categories->first()?->menus ?? [];
-                                ?>
-                                @forelse ($menus as $menu)
-                                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                                        <div class="d-flex align-items-center gap-3">
-                                            <img src="{{ asset('storage/' . $menu->image) }}" alt="Menu Image"
-                                                width="40" class="rounded">
-                                            <div class="ml-2">
-                                                <div>{{ $menu->name }}</div>
-                                                <small>{{ $menu->description }}</small>
+                                @if($categories->first())
+                                    @forelse ($categories->first()->menus as $menu)
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div class="d-flex align-items-center gap-3">
+                                                <img src="{{ asset('storage/' . $menu->image) }}" alt="{{ $menu->name }}"
+                                                    width="40" class="rounded trigger-lightbox" data-bs-toggle="modal" 
+                                                    data-bs-target="#imageModal" data-image="{{ asset('storage/' . $menu->image) }}"
+                                                    style="cursor: pointer;">
+                                                <div class="ml-2">
+                                                    <div>{{ $menu->name }}</div>
+                                                    <small>{{ $menu->description }}</small>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <strong>{!! $site_settings->currency_symbol !!} {{ $menu->price }}</strong>
+                                                <button class="m-1 btn btn-primary btn-sm edit-btn"
+                                                    data-id="{{ $menu->id }}" 
+                                                    data-name="{{ $menu->name }}"
+                                                    data-description="{{ $menu->description }}"
+                                                    data-price="{{ $menu->price_options }}"
+                                                    data-category_id="{{ $menu->category_id }}" 
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#editModal">
+                                                    <i class="fa fa-edit"></i>
+                                                </button>
+                                                <button class="m-1 btn btn-danger btn-sm delete-btn"
+                                                    data-id="{{ $menu->id }}" 
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteModal">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
                                             </div>
                                         </div>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <strong>{!! $site_settings->currency_symbol !!} {{ $menu->price }}</strong>
-                                            <button class="m-1 btn btn-primary btn-sm edit-btn"
-                                                data-id="{{ $menu->id }}" data-name="{{ $menu->name }}"
-                                                data-description="{{ $menu->description }}"
-                                                data-price="{{ $menu->price }}"
-                                                data-category_id="{{ $menu->category_id }}" data-bs-toggle="modal"
-                                                data-bs-target="#editModal">
-                                                <i class="fa fa-edit" aria-hidden="true"></i>
-                                            </button>
-                                            <button class="m-1 btn btn-danger btn-sm delete-btn"
-                                                data-id="{{ $menu->id }}" data-bs-toggle="modal"
-                                                data-bs-target="#deleteModal">
-                                                <i class="fa fa-trash" aria-hidden="true"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                @empty
-                                    <p>No menus available for this category.</p>
-                                @endforelse
+                                    @empty
+                                        <p>No menus available for this category.</p>
+                                    @endforelse
+                                @else
+                                    <p>No categories available. Please create a category first.</p>
+                                @endif
                             </div>
                         </div>
                     </div>
                 </div>
-
             </div>
 
-
-            <!-- Create Modal -->
+            <!-- Create Category Modal -->
             <div class="modal fade" id="createModalcategory" tabindex="-1" aria-labelledby="createModalcategoryLabel"
                 aria-hidden="true">
                 <div class="modal-dialog">
@@ -183,17 +114,18 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="createModalcategoryLabel">Add New Category</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"> <i
-                                        class="fas fa-times"></i></button>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                                    <i class="fas fa-times"></i>
+                                </button>
                             </div>
                             <div class="modal-body">
-                                <div class="form-group">
+                                <div class="form-group mb-3">
                                     <label for="name">Category Name</label>
                                     <input type="text" name="name" class="form-control" id="name" required>
                                 </div>
                                 <div class="form-group">
                                     <label for="description">Description</label>
-                                    <textarea rows="3" cols="4" name="description" class="form-control" id="description"></textarea>
+                                    <textarea rows="3" name="description" class="form-control" id="description"></textarea>
                                 </div>
                             </div>
                             <div class="modal-footer">
@@ -211,8 +143,9 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="imageModalLabel">Menu Image</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"> <i
-                                    class="fas fa-times"></i></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                                <i class="fas fa-times"></i>
+                            </button>
                         </div>
                         <div class="modal-body text-center">
                             <img id="modalImage" src="" alt="menu image" class="img-fluid">
@@ -221,7 +154,7 @@
                 </div>
             </div>
 
-            <!-- Add Modal -->
+            <!-- Add Menu Modal -->
             <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <form action="{{ route('admin.menus.store') }}" method="POST" enctype="multipart/form-data">
@@ -229,24 +162,25 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="addModalLabel">Add Menu</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"> <i
-                                        class="fas fa-times"></i></button>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                                    <i class="fas fa-times"></i>
+                                </button>
                             </div>
                             <div class="modal-body">
                                 <div class="mb-3">
-                                    <label for="name" class="form-label">Name</label>
-                                    <input type="text" name="name" class="form-control" id="name" required>
+                                    <label for="add-name" class="form-label">Name</label>
+                                    <input type="text" name="name" class="form-control" id="add-name" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="description" class="form-label">Description</label>
-                                    <textarea name="description" class="form-control" id="description" required></textarea>
+                                    <label for="add-description" class="form-label">Description</label>
+                                    <textarea name="description" class="form-control" id="add-description" required></textarea>
                                 </div>
                                 <div class="mb-3">
-                                    <div id="price-options-container">
+                                    <label class="form-label">Price Options</label>
+                                    <div id="add-price-options-container">
                                         <div class="row price-option mb-2">
                                             <div class="col-md-5">
-                                                <select name="price_options[0][name]"
-                                                    class="form-select price-name-select" style="width: 100%;">
+                                                <select name="price_options[0][name]" class="form-control">
                                                     <option value="small">Small</option>
                                                     <option value="medium">Medium</option>
                                                     <option value="large">Large</option>
@@ -258,25 +192,27 @@
                                                     placeholder="Price ({{ $site_settings->currency_symbol }})">
                                             </div>
                                             <div class="col-md-2 d-flex align-items-center">
-                                                <button type="button"
-                                                    class="btn btn-success btn-sm add-price-option me-2">+</button>
+                                                <button type="button" class="btn btn-success btn-sm add-price-option">
+                                                    <i class="fa fa-plus"></i>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
-
                                 </div>
-                                <div class="alert alert-danger" role="alert">
-                                    Recommended image size is <strong>500 x 400</strong>. Uploaded images will be cropped to
-                                    Recommended size.
+                                
+                                <div class="alert alert-info" role="alert">
+                                    <i class="fa fa-info-circle"></i> Recommended image size is <strong>500 x 400</strong>. 
+                                    Uploaded images will be cropped to recommended size.
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="image" class="form-label">Image</label>
-                                    <input type="file" name="image" class="form-control" id="image" required>
+                                    <label for="add-image" class="form-label">Image</label>
+                                    <input type="file" name="image" class="form-control" id="add-image" accept="image/*" required>
                                 </div>
+                                
                                 <div class="mb-3">
-                                    <label for="category_id" class="form-label">Category</label>
-                                    <select name="category_id" class="form-control" id="category_id" required>
+                                    <label for="add-category_id" class="form-label">Category</label>
+                                    <select name="category_id" class="form-control" id="add-category_id" required>
                                         @foreach ($categories as $category)
                                             <option value="{{ $category->id }}">{{ $category->name }}</option>
                                         @endforeach
@@ -292,7 +228,7 @@
                 </div>
             </div>
 
-            <!-- Edit Modal -->
+            <!-- Edit Menu Modal -->
             <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <form id="editForm" method="POST" enctype="multipart/form-data">
@@ -301,8 +237,9 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="editModalLabel">Edit Menu</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"> <i
-                                        class="fas fa-times"></i></button>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                                    <i class="fas fa-times"></i>
+                                </button>
                             </div>
                             <div class="modal-body">
                                 <div class="mb-3">
@@ -314,10 +251,11 @@
                                     <textarea name="description" class="form-control" id="editDescription" required></textarea>
                                 </div>
                                 <div class="mb-3">
-                                    <div id="price-options-container">
+                                    <label class="form-label">Price Options</label>
+                                    <div id="edit-price-options-container">
                                         <div class="row price-option mb-2">
                                             <div class="col-md-5">
-                                                <select name="price_options[0][name]" class="form-select price-name-select" style="width: 100%;">
+                                                <select name="price_options[0][name]" class="form-select price-name-select">
                                                     <option value="small">Small</option>
                                                     <option value="medium">Medium</option>
                                                     <option value="large">Large</option>
@@ -328,21 +266,25 @@
                                                     placeholder="Price ({{ $site_settings->currency_symbol }})">
                                             </div>
                                             <div class="col-md-2 d-flex align-items-center">
-                                                <button type="button" class="btn btn-success btn-sm add-price-option me-2">+</button>
-                                                <button type="button" class="btn btn-danger btn-sm remove-price-option">×</button>
+                                                <button type="button" class="btn btn-success btn-sm add-price-option">
+                                                    <i class="fa fa-plus"></i>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
-                                    
                                 </div>
-                                <div class="alert alert-danger" role="alert">
-                                    Recommended image size is <strong>500 x 400</strong>. Uploaded images will be cropped to
-                                    Recommended size.
+                                
+                                <div class="alert alert-info" role="alert">
+                                    <i class="fa fa-info-circle"></i> Recommended image size is <strong>500 x 400</strong>. 
+                                    Uploaded images will be cropped to recommended size.
                                 </div>
+                                
                                 <div class="mb-3">
                                     <label for="editImage" class="form-label">Image</label>
-                                    <input type="file" name="image" class="form-control" id="editImage">
+                                    <input type="file" name="image" class="form-control" id="editImage" accept="image/*">
+                                    <small class="text-muted">Leave empty to keep current image</small>
                                 </div>
+                                
                                 <div class="mb-3">
                                     <label for="editCategory" class="form-label">Category</label>
                                     <select name="category_id" class="form-control" id="editCategory" required>
@@ -361,9 +303,8 @@
                 </div>
             </div>
 
-            <!-- Delete Modal -->
-            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel"
-                aria-hidden="true">
+            <!-- Delete Menu Modal -->
+            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <form id="deleteForm" method="POST">
                         @csrf
@@ -371,89 +312,206 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="deleteModalLabel">Delete Menu</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"> <i
-                                        class="fas fa-times"></i></button>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                                    <i class="fas fa-times"></i>
+                                </button>
                             </div>
                             <div class="modal-body">
-                                Are you sure you want to delete this menu?
+                                <p>Are you sure you want to delete this menu?</p>
+                                <p class="text-danger"><i class="fa fa-exclamation-triangle"></i> This action cannot be undone.</p>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                                 <button type="submit" class="btn btn-danger">Delete</button>
                             </div>
                         </div>
                     </form>
                 </div>
             </div>
-
         </div>
         <!-- content-wrapper ends -->
         @include('partials.admin.footer')
     </div>
-    <!-- main-panel ends -->
+@endsection
+
+@push('scripts')
+    <!-- Core JS files -->
+    <script src="/admin_resources/vendors/js/vendor.bundle.base.js"></script>
+    <script src="/admin_resources/js/off-canvas.js"></script>
+    <script src="/admin_resources/js/hoverable-collapse.js"></script>
+    <script src="/admin_resources/js/template.js"></script>
+    <script src="/admin_resources/js/settings.js"></script>
+    <script src="/admin_resources/js/todolist.js"></script>
+    
+    <!-- Plugin JS -->
+    <script src="/admin_resources/vendors/progressbar.js/progressbar.min.js"></script>
+    <script src="/admin_resources/vendors/chart.js/Chart.min.js"></script>
+    <script src="/admin_resources/js/dashboard.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+    
     <script>
-        document.querySelectorAll('.category-item').forEach(item => {
-            item.addEventListener('click', function() {
-                document.querySelectorAll('.category-item').forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
-
-                const categoryId = this.getAttribute('data-category-id');
-
-                // TODO: Replace this part with an AJAX call to load menus for selected category
-                // Example:
-                fetch(`menus-by-category/${categoryId}`)
-                    .then(response => response.text())
-                    .then(html => {
-                        document.getElementById('menuItemGet').innerHTML = html;
-                    });
-            });
-        });
-        let index = 1;
-
-        function getNewRow(i) {
-            return `
-    <div class="row price-option mb-2">
-        <div class="col-md-5">
-            <select name="price_options[${i}][name]" class="form-select price-name-select" style="width: 100%;">
-                <option value="small">Small</option>
-                <option value="medium">Medium</option>
-                <option value="large">Large</option>
-            </select>
-        </div>
-        <div class="col-md-5">
-            <input type="number" step="0.01" name="price_options[${i}][price]" class="form-control" placeholder="Price ({{ $site_settings->currency_symbol }})">
-        </div>
-        <div class="col-md-2 d-flex align-items-center">
-            <button type="button" class="btn btn-success add-price-option me-2 btn-sm">+</button>
-            <button type="button" class="btn btn-danger remove-price-option btn-sm">×</button>
-        </div>
-    </div>`;
-        }
-
-        function initSelect2($context) {
-            $context.find('.price-name-select').select2({
-                tags: true,
-                placeholder: "Select or type price name",
-                allowClear: true,
-                width: '100%'
-            });
-        }
-
         $(document).ready(function() {
-            initSelect2($('#price-options-container')); // initialize for the first one
+
+            
+            // Edit Modal
+            $(document).on('click', '.edit-btn', function() {
+                let id = $(this).data('id');
+                let name = $(this).data('name');
+                let description = $(this).data('description');
+                // Expected structure: price is an array of objects with 'name' and 'price' properties
+                let price = $(this).data('price_options');
+
+                console.log(price);
+                if (Array.isArray(price) && price.every(item => item.name && item.price)) {
+                    $('#edit-price-options-container').empty();
+                    price.forEach((option, index) => {
+                        const priceOptionRow = `
+                            <div class="row price-option mb-2">
+                                <div class="col-md-5">
+                                    <select name="price_options[${index}][name]" class="form-control">
+                                        <option value="small" ${option.name === 'small' ? 'selected' : ''}>Small</option>
+                                        <option value="medium" ${option.name === 'medium' ? 'selected' : ''}>Medium</option>
+                                        <option value="large" ${option.name === 'large' ? 'selected' : ''}>Large</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-5">
+                                    <input type="number" step="0.01" name="price_options[${index}][price]" class="form-control" 
+                                           placeholder="Price ({{ $site_settings->currency_symbol }})" value="${option.price}">
+                                </div>
+                                <div class="col-md-2 d-flex align-items-center">
+                                    <button type="button" class="btn btn-danger btn-sm remove-price-option">
+                                        <i class="fa fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>`;
+                        $('#edit-price-options-container').append(priceOptionRow);
+                    });
+                } else {
+                    $('#edit-price-options-container').empty();
+                }
+                // Assuming price is an array of objects with name and price properties
+                // You might need to handle this differently based on your backend structure
+                // If you have multiple price options, you might want to loop through them
+                let category_id = $(this).data('category_id');
+
+                let actionUrl = "{{ route('admin.menus.update', ':id') }}".replace(':id', id);
+
+                $('#editName').val(name);
+                $('#editDescription').val(description);
+                $('#editCategory').val(category_id);
+                $('#editForm').attr('action', actionUrl);
+                
+                // For price options, we'll need to load them via AJAX or predefine them
+                // This depends on how your backend handles price options
+            });
+
+            // Delete Modal
+            $(document).on('click', '.delete-btn', function() {
+                let id = $(this).data('id');
+                let actionUrl = "{{ route('admin.menus.destroy', ':id') }}".replace(':id', id);
+                $('#deleteForm').attr('action', actionUrl);
+            });
+
+            // Menu Search
+            $(document).on('input', '#menu-search', function() {
+                const keyword = $(this).val().toLowerCase().trim();
+                
+                $('#menu-list .list-group-item').each(function() {
+                    const text = $(this).text().toLowerCase();
+                    $(this).toggle(text.includes(keyword));
+                });
+            });
+            
+            // Image Lightbox
+            $(document).on('click', '.trigger-lightbox', function() {
+                const imageUrl = $(this).data('image');
+                $('#modalImage').attr('src', imageUrl);
+            });
+
+            // Category Selection
+            $('.category-item').on('click', function() {
+                // Remove active class from all categories
+                $('.category-item').removeClass('active');
+                
+                // Add active class to clicked category
+                $(this).addClass('active');
+                
+                const categoryId = $(this).data('category-id');
+                const categoryName = $(this).data('category-name');
+                
+                // Update selected category name
+                $('#selected-category-name').text(categoryName);
+                
+                // Set the default category in the add menu form
+                $('#add-category_id').val(categoryId);
+                
+                // Fetch menus for selected category via AJAX
+                $.ajax({
+                    url: `menus-by-category/${categoryId}`,
+                    type: 'GET',
+                    success: function(response) {
+                        $('#menuItemGet').html(response);
+                        
+                        // Re-initialize any JS components that might be in the response
+                        initializeEventHandlers();
+                    },
+                    error: function(xhr) {
+                        console.error('Error loading menus:', xhr.responseText);
+                    }
+                });
+            });
+
+
+
+            // Set up price option management
+            let index = 1;
+            
+            function getNewRow(i) {
+                return `
+                <div class="row price-option mb-2">
+                    <div class="col-md-5">
+                        <select name="price_options[${i}][name]" class="form-control">
+                            <option value="small">Small</option>
+                            <option value="medium">Medium</option>
+                            <option value="large">Large</option>
+                        </select>
+                    </div>
+                    <div class="col-md-5">
+                        <input type="number" step="0.01" name="price_options[${i}][price]" class="form-control" 
+                               placeholder="Price ({{ $site_settings->currency_symbol }})">
+                    </div>
+                    <div class="col-md-2 d-flex align-items-center">
+                        <button type="button" class="btn btn-danger btn-sm remove-price-option">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                </div>`;
+            }
+            
+            // Function to initialize event handlers for dynamically loaded content
+            function initializeEventHandlers() {
+                // Initialize any JS components that might be in dynamically loaded content
+                $('.trigger-lightbox').on('click', function() {
+                    const imageUrl = $(this).data('image');
+                    $('#modalImage').attr('src', imageUrl);
+                });
+            }
 
             $(document).on('click', '.add-price-option', function() {
+                const container = $(this).closest('.modal-body').find('[id$=price-options-container]');
                 const $newRow = $(getNewRow(index));
-                $('#price-options-container').append($newRow);
-                initSelect2($newRow); // only init select2 for the new row
+                container.append($newRow);
+              
                 index++;
             });
 
+            // Remove price option row
             $(document).on('click', '.remove-price-option', function() {
                 $(this).closest('.price-option').remove();
             });
+             
         });
     </script>
-@endsection
+@endpush

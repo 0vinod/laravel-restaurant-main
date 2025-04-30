@@ -16,7 +16,7 @@ class MenuRequest extends FormRequest
         $rules = [
             'name' => 'required|string|max:255',
             'description' => 'required',
-            'price_options' => 'required|json|min:0',
+            'price_options' => 'required|array',
             'category_id' => 'required|exists:categories,id',
         ];
 
