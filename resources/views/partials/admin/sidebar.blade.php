@@ -9,7 +9,9 @@
     font-size: 1.5rem;
     transition: fill 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
-        </style>
+</style>
+
+
         <nav class="sidebar sidebar-offcanvas" id="sidebar">
             <ul class="nav">
                 <li class="nav-item">

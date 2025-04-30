@@ -9,7 +9,11 @@ class Menu extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'price', 'image', 'category_id'];
+    protected $fillable = ['name', 'description', 'price_options', 'image', 'category_id'];
+
+    protected $casts = [
+        'price_options' => 'json',
+    ];
 
     public function category()
     { 
