@@ -22,12 +22,18 @@
             </div>
         </div>
         <div class="d-flex align-items-center gap-2">
-            <strong>{!! $site_settings->currency_symbol !!} {{ $menu->price }}</strong>
+            <?php
+            $menuPrice = $menu->price_options;
+            ?>
+                @foreach($menuPrice as $priceOption)
+                <span class="badge bg-primary">{{ $priceOption['name'] }} : {!! $site_settings->currency_symbol !!} {{ $priceOption['price'] }}</span>
+                @endforeach
+           
             <button class="m-1 btn btn-primary btn-sm edit-btn"
                 data-id="{{ $menu->id }}"
                 data-name="{{ $menu->name }}"
                 data-description="{{ $menu->description }}"
-                data-price="{{ $menu->price }}"
+                data-price="{{ $menu->price_options ? json_encode($menu->price_options) : '' }}"
                 data-category_id="{{ $menu->category_id }}"
                 data-bs-toggle="modal"
                 data-bs-target="#editModal">

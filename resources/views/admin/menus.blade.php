@@ -74,12 +74,17 @@
                                                 </div>
                                             </div>
                                             <div class="d-flex align-items-center gap-2">
-                                                <strong>{!! $site_settings->currency_symbol !!} {{ $menu->price }}</strong>
+                                            <?php
+            $menuPrice = $menu->price_options;
+            ?>
+                @foreach($menuPrice as $priceOption)
+                <span class="badge bg-primary">{{ $priceOption['name'] }} : {!! $site_settings->currency_symbol !!} {{ $priceOption['price'] }}</span>
+                @endforeach
                                                 <button class="m-1 btn btn-primary btn-sm edit-btn"
                                                     data-id="{{ $menu->id }}" 
                                                     data-name="{{ $menu->name }}"
                                                     data-description="{{ $menu->description }}"
-                                                    data-price="{{ $menu->price_options }}"
+                                                    data-price="{{ $menu->price_options ? json_encode($menu->price_options) : '' }}"
                                                     data-category_id="{{ $menu->category_id }}" 
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#editModal">
@@ -360,11 +365,9 @@
                 let id = $(this).data('id');
                 let name = $(this).data('name');
                 let description = $(this).data('description');
-                // Expected structure: price is an array of objects with 'name' and 'price' properties
-                let price = $(this).data('price_options');
-
-                console.log(price);
-                if (Array.isArray(price) && price.every(item => item.name && item.price)) {
+                let price = $(this).data('price');
+                var priceOptions = JSON.parse(price);
+                if (Array.isArray(priceOptions) && priceOptions.length > 0) {
                     $('#edit-price-options-container').empty();
                     price.forEach((option, index) => {
                         const priceOptionRow = `
