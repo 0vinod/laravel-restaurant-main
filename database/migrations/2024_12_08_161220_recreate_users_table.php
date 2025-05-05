@@ -34,6 +34,7 @@ class RecreateUsersTable extends Migration
             $table->rememberToken();
             $table->tinyInteger('two_factor_auth')->default(0);
             $table->timestamp('email_verified_at')->nullable();
+            $table->foreignId('restaurant_id')->constrained('restaurants')->onDelete('cascade');
             $table->timestamps();
         });
     }

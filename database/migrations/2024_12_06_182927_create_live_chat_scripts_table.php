@@ -12,6 +12,7 @@ class CreateLiveChatScriptsTable extends Migration
             $table->id();
             $table->string('name'); // e.g., Tawk.to or Smartsupp
             $table->text('script_code'); // Stores the script code
+            $table->foreignId('restaurant_id')->constrained('restaurants')->onDelete('cascade');
             $table->timestamps();
         });
     }

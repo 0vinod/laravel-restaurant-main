@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->text('content'); // RTF content
             $table->string('image'); // For storing image path
+            $table->foreignId('restaurant_id')->constrained('restaurants')->onDelete('cascade');
             $table->timestamps();
         });
     }

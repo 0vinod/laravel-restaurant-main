@@ -12,6 +12,7 @@ class CreateSocialMediaHandlesTable extends Migration
             $table->id();
             $table->string('handle');
             $table->enum('social_media', ['facebook', 'instagram', 'youtube', 'tiktok']);
+            $table->foreignId('restaurant_id')->constrained('restaurants')->onDelete('cascade');
             $table->timestamps();
         });
     }

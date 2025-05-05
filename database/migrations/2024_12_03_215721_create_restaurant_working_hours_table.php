@@ -11,6 +11,7 @@ class CreateRestaurantWorkinghoursTable extends Migration
         Schema::create('restaurant_workinghours', function (Blueprint $table) {
             $table->id();
             $table->string('working_hours');
+            $table->foreignId('restaurant_id')->constrained('restaurants')->onDelete('cascade');
             $table->timestamps();
         });
     }

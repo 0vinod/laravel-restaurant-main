@@ -11,6 +11,7 @@ class CreateRestaurantAddressesTable extends Migration
         Schema::create('restaurant_addresses', function (Blueprint $table) {
             $table->id();
             $table->string('address');
+            $table->foreignId('restaurant_id')->constrained('restaurants')->onDelete('cascade');
             $table->timestamps();
         });
     }

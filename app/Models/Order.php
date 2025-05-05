@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Http\Trait\WithRestaurant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
-    use HasFactory;
+    use HasFactory, WithRestaurant;
 
 
     protected $fillable = [
@@ -25,6 +26,7 @@ class Order extends Model
         'delivery_fee',
         'delivery_distance',
         'price_per_mile',
+        'restaurant_id',
     ];
     
 

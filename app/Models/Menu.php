@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
+use App\Http\Trait\WithRestaurant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Menu extends Model
 {
-    use HasFactory;
+    use HasFactory, WithRestaurant;
 
-    protected $fillable = ['name', 'description', 'price_options', 'image', 'category_id'];
+    protected $fillable = ['name', 'description', 'price_options', 'image', 'category_id','restaurant_id','menu_type_id','display_on','preparation_time'];
 
     protected $casts = [
         'price_options' => 'json',

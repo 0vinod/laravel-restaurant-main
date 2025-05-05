@@ -133,15 +133,24 @@ Route::prefix('admin')->middleware(RedirectIfNotAdmin::class)->group(function ()
 
         // Admin Settings Category
         Route::get('category', [CategoryController::class, 'index'])->name('admin.categories.index');
-        Route::post('category/store', [CategoryController::class, 'store'])->name('admin.categories.store');
+        Route::post('category/store/{menuType}', [CategoryController::class, 'store'])->name('admin.categories.store');
         Route::post('category/update/{id}', [CategoryController::class, 'update'])->name('admin.categories.update');
         Route::post('category/delete/{id}', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
 
         //Admin Settings Menu
-        Route::get('menu', [MenuController::class, 'index'])->name('admin.menus.index');
-        Route::post('menu', [MenuController::class, 'store'])->name('admin.menus.store');
-        Route::patch('menu/{id}', [MenuController::class, 'update'])->name('admin.menus.update');
-        Route::delete('menu/{id}', [MenuController::class, 'destroy'])->name('admin.menus.destroy');
+        Route::post('/import-menu-review', [MenuController::class, 'review'])->name('import.menu.review');
+        Route::post('/import-menu-upload', [MenuController::class, 'upload'])->name('import.menu.upload');
+        Route::get('/import-menu-upload', [MenuController::class, 'uploadView'])->name('import.menu.upload.view');
+        Route::get('menu_import', [MenuController::class, 'menuImport'])->name('admin.sample_menu_import');
+        Route::get('/import/sample-download', [MenuController::class, 'downloadSample'])->name('import.sample.download');
+        Route::get('menu_dashboard', [MenuController::class, 'menuDashboard'])->name('admin.menus.dashboard');
+        Route::get('/get-menu-type/{id}', [MenuController::class, 'getMenuType'])->name('admin.menus.get');
+        Route::post('/store-or-update', [MenuController::class, 'menuTypeStoreOrUpdate'])->name('admin.menus.store-or-update');
+        Route::delete('/delete/{id}', [MenuController::class, 'menuTypeDelete'])->name('admin.menus.delete');
+        Route::get('menu/{menuType}', [MenuController::class, 'index'])->name('admin.menus.index');
+        Route::post('menu/{menuType}', [MenuController::class, 'store'])->name('admin.menus.store');
+        Route::patch('menu/{menuType}/{id}', [MenuController::class, 'update'])->name('admin.menus.update');
+        Route::delete('menu/{menuType}/{id}', [MenuController::class, 'destroy'])->name('admin.menus.destroy');
         Route::get('/menus-by-category/{id}', [MenuController::class, 'menusByCategory']);
         Route::get('general-settings', [GeneralSettingsController::class, 'index'])->name('admin.general-settings');
 

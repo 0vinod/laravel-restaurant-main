@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::create('privacy_policies', function (Blueprint $table) {
             $table->id();
             $table->text('content');  
+            $table->foreignId('restaurant_id')->constrained('restaurants')->onDelete('cascade');
             $table->timestamps();   
         });
     }

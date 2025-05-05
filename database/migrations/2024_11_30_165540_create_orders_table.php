@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('customer_address')->nullable();
             $table->decimal('total_price', 10, 2);
             $table->enum('status', ['pending', 'completed', 'cancelled'])->default('pending');
+            $table->foreignId('restaurant_id')->constrained('restaurants')->onDelete('cascade');
             $table->timestamps();
         });
         

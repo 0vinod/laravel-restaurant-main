@@ -11,6 +11,7 @@ class CreateRestaurantPhonenumbersTable extends Migration
         Schema::create('restaurant_phonenumbers', function (Blueprint $table) {
             $table->id();
             $table->string('phone_number');
+            $table->foreignId('restaurant_id')->constrained('restaurants')->onDelete('cascade');
             $table->timestamps();
         });
     }

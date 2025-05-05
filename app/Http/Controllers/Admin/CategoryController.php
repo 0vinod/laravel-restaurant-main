@@ -6,6 +6,8 @@ use App\Models\Category;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CategoryRequest;
 use App\Http\Controllers\Traits\AdminViewSharedDataTrait;
+use App\Models\Menu;
+use App\Models\MenuType;
 
 class CategoryController extends Controller
 {
@@ -24,11 +26,12 @@ class CategoryController extends Controller
         return view('admin.categories', compact('categories'));
     }
 
-    public function store(CategoryRequest $request)
+    public function store(CategoryRequest $request, MenuType $menuType)
     {
         Category::create([
             'name' => $request->name,
             'descrption' => $request->descrption,
+            'menu_type_id' => $menuType->id,
             ]);
         return redirect()->back()->with('success', 'Category created successfully.');
     }

@@ -19,6 +19,7 @@ class CreateCustomersTable extends Migration
             $table->string('email');
             $table->string('phone_number'); 
             $table->text('address');  
+            $table->foreignId('restaurant_id')->constrained('restaurants')->onDelete('cascade');
             $table->timestamps(); 
         });
     }

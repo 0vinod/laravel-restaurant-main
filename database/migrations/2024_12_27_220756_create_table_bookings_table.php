@@ -17,6 +17,7 @@ class CreateTableBookingsTable extends Migration
             $table->date('date');
             $table->string('time');
             $table->integer('persons');
+            $table->foreignId('restaurant_id')->constrained('restaurants')->onDelete('cascade');
             $table->timestamps();
         });
     }
