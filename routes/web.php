@@ -18,9 +18,9 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\TestimonyController;
 use App\Http\Controllers\Admin\PrivacyPolicyController;
 use App\Http\Controllers\Admin\GeneralSettingsController;
+use App\Http\Controllers\Admin\StoreController;
 use App\Http\Controllers\Admin\TermsAndConditionController;
 use App\Http\Controllers\Admin\TableBookingController as AdminTableBookingController;
-
 
 Route::get('/', [MainSiteController::class, 'home'])->name('home');
 
@@ -138,7 +138,8 @@ Route::prefix('admin')->middleware(RedirectIfNotAdmin::class)->group(function ()
         Route::post('category/delete/{id}', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
 
         //Admin Settings Menu
-        Route::post('/import-menu-review', [MenuController::class, 'review'])->name('import.menu.review');
+        Route::get('/import.menu.upload.approve', [MenuController::class, 'approveImport'])->name('import.menu.upload.approve');
+        Route::get('/import-menu-review', [MenuController::class, 'review'])->name('import.menu.review');
         Route::post('/import-menu-upload', [MenuController::class, 'upload'])->name('import.menu.upload');
         Route::get('/import-menu-upload', [MenuController::class, 'uploadView'])->name('import.menu.upload.view');
         Route::get('menu_import', [MenuController::class, 'menuImport'])->name('admin.sample_menu_import');
@@ -154,7 +155,28 @@ Route::prefix('admin')->middleware(RedirectIfNotAdmin::class)->group(function ()
         Route::get('/menus-by-category/{id}', [MenuController::class, 'menusByCategory']);
         Route::get('general-settings', [GeneralSettingsController::class, 'index'])->name('admin.general-settings');
 
+        // Store admin
+        Route::get('/stores', [StoreController::class, 'index'])->name('admin.stores.index');
+        Route::post('/stores/create-or-update', [StoreController::class, 'storeCreateOrUpdate'])->name('stores.storeCreateOrUpdate');
+        Route::delete('/stores/delete', [StoreController::class, 'deleteStore'])->name('stores.delete');
+        Route::get('/stores/{id}/edit', [StoreController::class, 'editStore'])->name('admin.stores.edit');
+
+
+        // Store Tables
+        Route::post('/stores/table/create-or-update', [StoreController::class, 'storeTableCreateOrUpdate'])->name('stores.tableCreateOrUpdate');
+        Route::delete('/stores/table/delete', [StoreController::class, 'storeTableDelete'])->name('stores.tableDelete');
         
+        // Store Opening Hours
+        Route::post('/stores/opening-hour/create-or-update', [StoreController::class, 'storeOpeningHourCreateOrUpdate'])->name('stores.openingHourCreateOrUpdate');
+        Route::delete('/stores/opening-hour/delete', [StoreController::class, 'storeOpeningHourDelete'])->name('stores.openingHourDelete');
+        
+        // Store Users (optional - if user CRUD is included)
+        Route::post('/stores/user/create-or-update', [StoreController::class, 'storeUserCreateOrUpdate'])->name('stores.userCreateOrUpdate');
+        Route::delete('/stores/user/delete', [StoreController::class, 'storeUserDelete'])->name('stores.userDelete');
+
+        
+
+
         //Admin Settings Phone Number routes
         Route::post('phone-number', [GeneralSettingsController::class, 'storePhoneNumber'])->name('admin.phone-number.store');
         Route::put('phone-number/{id}', [GeneralSettingsController::class, 'updatePhoneNumber'])->name('admin.phone-number.update');

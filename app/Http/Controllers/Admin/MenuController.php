@@ -201,7 +201,7 @@ class MenuController extends Controller
 
     public function menuImport()
     {
-        return view('admin.menu_import');
+        return view('admin.import_menu.menu_import');
     }
     public function downloadSample()
     {
@@ -211,7 +211,7 @@ class MenuController extends Controller
 
     public function uploadView()
     {
-        return view('admin.import_menu_upload');
+        return view('admin.import_menu.import_menu_upload');
     }
 
     public function upload(Request $request)
@@ -219,29 +219,27 @@ class MenuController extends Controller
         $request->validate([
             'menu_file' => 'required|file|mimes:xlsx',
         ]);
-    
+
         $file = $request->file('menu_file');
         $filename = 'menu_' . time() . '.' . $file->getClientOriginalExtension();
         $filepath = $file->storeAs('uploads/menus', $filename, 'public');
-    
+
         // Use full path for Laravel Excel to locate the file
         Excel::import(new MenuImport(), storage_path("app/public/{$filepath}"));
-    
+
         return redirect()->route('import.menu.review')->with('success', 'File uploaded successfully!');
     }
 
     public function review()
     {
-        // Logic to read the uploaded file and show a preview
-        $filePath = storage_path('app/public/uploads/menus/menu_' . time() . '.xlsx');
+        $menu =  Menu::with('category')->where('is_imported', 1)->get();
 
-        if (!file_exists($filePath)) {
-            return redirect()->back()->with('error', 'File not found!');
-        }
+        return view('admin.import_menu.menu_review', compact('menu'));
+    }
+    public function approveImport()
+    {
+        Menu::where('is_imported', 1)->update(['import_approve' => 1]);
 
-        // Read the file and prepare data for review
-        // $data = \Excel::toArray(new \App\Imports\MenuImport, $filePath);
-
-        return view('admin.menu_review', compact('data'));
+        return redirect()->route('admin.menus.dashboard');
     }
 }

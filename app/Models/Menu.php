@@ -20,4 +20,8 @@ class Menu extends Model
     { 
         return $this->belongsTo(Category::class);
     }
+
+    public function menuType(){
+        return $this->belongsTo(MenuType::class,'menu_type_id');
+    }
 }

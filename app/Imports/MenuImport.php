@@ -3,6 +3,7 @@ namespace App\Imports;
 
 use App\Models\Category;
 use App\Models\Menu;
+use App\Models\MenuType;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\ToCollection;
@@ -26,17 +27,26 @@ class MenuImport implements ToCollection, WithHeadingRow, WithBatchInserts, With
 
                 // Find or create category
                 $category = Category::firstOrCreate([
-                    'name' => trim($row['food_category'])
+                    'name' => trim($row['food_category']),
+                    'description' => trim($row['food_description'])
                 ]);
+
+                $menuType = MenuType::firstOrCreate([
+                    'name' => trim($row['food_category']),
+                    'description' => trim($row['food_description'])
+                ]);
+
 
                 // Create menu item
                 Menu::create([
                     'name' => trim($row['food_name']),
                     'description' => $row['food_description'] ?? null,
                     'category_id' => $category->id,
-                    'display_on' => $row['display_on'] ?? 1,
-                    'preparation_time' => $row['preparation_time_minutes'] ?? null,
+                    // 'display_on' => $row['display_on'] ?? 1,
+                    // 'preparation_time' => $row['preparation_time_minutes'] ?? null,
+                    'menu_type_id' =>  $menuType->id,
                     'price_options' => json_encode($this->addPriceOptions($row)),
+                    'is_imported' => 1,
                 ]);
             }
 

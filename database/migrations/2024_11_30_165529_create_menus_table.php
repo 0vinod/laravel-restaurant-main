@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('image');
             $table->string('preparation_time')->nullable();
             $table->string('display_on')->default(1);
-           $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
+            $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
             $table->foreignId('updated_by')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
